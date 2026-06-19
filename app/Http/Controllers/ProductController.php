@@ -21,7 +21,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return "create";
+        return view('product.create');
     }
 
     /**
@@ -29,7 +29,17 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0|max:999999.99',
+        ]);
+
+        Product::create($validated);
+
+        return redirect()
+            ->route('prod.index')
+            ->with('success', 'Producto creado correctamente.');
     }
 
     /**
@@ -45,7 +55,9 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        return "edit " . $id;
+        $product = Product::findOrFail($id);
+
+        return view('product.edit', compact('product'));
     }
 
     /**
@@ -53,7 +65,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0|max:999999.99',
+        ]);
+
+        $product->update($validated);
+
+        return redirect()
+            ->route('prod.index')
+            ->with('success', 'Producto actualizado correctamente.');
     }
 
     /**
